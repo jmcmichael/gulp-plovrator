@@ -23,13 +23,9 @@ module.exports = function(opt, execFile_opt) {
     throw new gutil.PluginError(PLUGIN_NAME, 'Missing fileName option.');
 
   var getFlagFilePath = function(files) {
-    var dirName = uuid.v4();
     var src = files.map(function(file) {
       var relativePath = path.relative(file.cwd, file.path);
-      var fullpath = path.join(tmpdir, dirName, relativePath);
-      mkdirp.sync(path.dirname(fullpath));
-      fs.writeFileSync(fullpath, file.contents.toString());
-      return '--js="' + fullpath + '"';
+      return '--js="' + relativePath + '"';
     }).join('\n');
     return tempWrite.sync(src);
   };
@@ -98,7 +94,7 @@ module.exports = function(opt, execFile_opt) {
     args = javaFlags.concat(args);
 
     // Force --js_output_file to prevent [Error: stdout maxBuffer exceeded.]
-    args.push('--js_output_file="' + outputFilePath + '"');
+    args.push('--js_output_file="' + opt.fileName + '"');
 
     // Enable custom max buffer to fix "stderr maxBuffer exceeded" error. Default is 1000*1024.
     var executable = opt.compilerPath ? 'java' : 'closure-compiler';
@@ -113,7 +109,7 @@ module.exports = function(opt, execFile_opt) {
         gutil.log(stderr);
       }
 
-      var outputFileSrc = fs.readFile(outputFilePath, function(err, data) {
+      var outputFileSrc = fs.readFile(opt.fileName, function(err, data) {
         if (err) {
           this.emit('error', new gutil.PluginError(PLUGIN_NAME, err));
           process.exit(1);
