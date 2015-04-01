@@ -65,6 +65,31 @@ gulp.task('default', function() {
 });
 ```
 
+### Compiling with Google Closure Library
+
+The current version of the compiler doesn't need a deps file as it used to. Now you need to supply the directories where your dependencies are defined (via goog.provide).
+
+```js
+var gulp = require('gulp');
+var closureCompiler = require('gulp-closure-compiler');
+
+gulp.task('default', function() {
+  return gulp.src(['main.js', 'src/**/*.js', 'bower_components/closure-library/closure/goog/**/*.js'])
+    .pipe(closureCompiler({
+      compilerPath: 'bower_components/closure-compiler/compiler.jar',
+      fileName: 'build.js',
+      compilerFlags: {
+        closure_entry_point: 'app.main',
+        compilation_level: 'ADVANCED_OPTIMIZATIONS',
+        only_closure_dependencies: true,
+        warning_level: 'VERBOSE'
+      }
+    }))
+    .pipe(gulp.dest('dist'));
+});
+```
+
+
 ## API
 
 ### closureCompiler(options)
