@@ -96,6 +96,11 @@ module.exports = function(opt, execFile_opt) {
     // Force --js_output_file to prevent [Error: stdout maxBuffer exceeded.]
     args.push('--js_output_file="' + opt.fileName + '"');
 
+    // Create directory for output file if it doesn't exist.
+    if (opt.fileName && !fs.existsSync(path.dirname(opt.fileName))) {
+      fs.mkdirSync(path.dirname(opt.fileName));
+    }
+
     // Enable custom max buffer to fix "stderr maxBuffer exceeded" error. Default is 1000*1024.
     var executable = opt.compilerPath ? 'java' : 'closure-compiler';
     var jar = execFile(executable, args, { maxBuffer: opt.maxBuffer*1024 }, function(error, stdout, stderr) {
