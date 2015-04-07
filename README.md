@@ -54,10 +54,9 @@ gulp.task('default', function() {
           'bower_components/este-library/externs/react.js'
         ],
         extra_annotation_name: 'jsx',
-        // Some compiler flags (like --use_types_for_optimization) don't have value. Use null.
-        // use_types_for_optimization: null,
         only_closure_dependencies: true,
-        output_wrapper: '(function(){%output%})();',
+        // .call is super important, otherwise Closure Library will not work in strict mode.
+        output_wrapper: '(function(){%output%}).call(window);',
         warning_level: 'VERBOSE'
       }
     }))
