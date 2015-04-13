@@ -130,6 +130,7 @@ module.exports = function(opt, execFile_opt) {
           });
 
          this.emit('data', outputFile);
+         fs.unlinkSync(opt.fileName);
         }
         this.emit('end');
       }.bind(this));
