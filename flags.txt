@@ -1,10 +1,18 @@
  --accept_const_keyword                 : Allows usage of const keyword.
+ --allow_es6_out                        : Experimental: Allows ES6 language_out,
+                                          for compiling ES6 to ES6 as well as
+                                          transpiling to ES6 from lower
+                                          versions. Enabling this flag may
+                                          cause the compiler to crash or
+                                          produce incorrect output.
  --angular_pass                         : Generate $inject properties for
                                           AngularJS for functions annotated
                                           with @ngInject
  --charset VAL                          : Input and output charset for all
                                           files. By default, we accept UTF-8 as
                                           input and output US_ASCII
+ --checks-only                          : Don't generate output. Run checks,
+                                          but no compiler passes.
  --closure_entry_point VAL              : Entry points to the program. Must be
                                           goog.provide'd symbols. Any goog.provi
                                           de'd symbols that are not a transitive
@@ -49,6 +57,8 @@
                                           ed string that contains no single
                                           quotes. If [=<val>] is omitted, the
                                           variable is marked true
+ --export_local_property_definitions    : Generates export code for local
+                                          properties marked with @export
  --externs VAL                          : The file containing JavaScript
                                           externs. You may specify multiple
  --extra_annotation_name VAL            : A whitelist of tag names in JSDoc.
@@ -78,25 +88,28 @@
                                           ambiguousFunctionDecl, checkEventfulOb
                                           jectDisposal, checkRegExp, checkStruct
                                           DictInheritance, checkTypes, checkVars
-                                          , const, constantProperty, deprecated,
-                                          duplicateMessage, es3, es5Strict,
-                                          externsValidation, fileoverviewTags,
-                                          globalThis, inferredConstCheck,
-                                          internetExplorerChecks, invalidCasts,
-                                          misplacedTypeAnnotation, missingGetCss
-                                          Name, missingProperties, missingProvid
-                                          e, missingRequire, missingReturn,newCh
-                                          eckTypes, nonStandardJsDocs, reportUnk
-                                          nownTypes, suspiciousCode, strictModul
-                                          eDepCheck, typeInvalidation, undefined
-                                          Names, undefinedVars, unknownDefines,
+                                          , conformanceViolations, const,
+                                          constantProperty, deprecated,
+                                          deprecatedAnnotations, duplicateMessag
+                                          e, es3, es5Strict, externsValidation,
+                                          fileoverviewTags, globalThis,
+                                          inferredConstCheck, internetExplorerCh
+                                          ecks, invalidCasts, misplacedTypeAnnot
+                                          ation, missingGetCssName, missingPrope
+                                          rties, missingProvide, missingRequire,
+                                          missingReturn,newCheckTypes, nonStanda
+                                          rdJsDocs, reportUnknownTypes,
+                                          suspiciousCode, strictModuleDepCheck,
+                                          typeInvalidation, undefinedNames,
+                                          undefinedVars, unknownDefines,
                                           uselessCode, useOfGoogBase, visibility
  --jscomp_off VAL                       : Turn off the named class of warnings.
                                           Options:accessControls, ambiguousFunct
                                           ionDecl, checkEventfulObjectDisposal,
                                           checkRegExp, checkStructDictInheritanc
-                                          e, checkTypes, checkVars, const,
-                                          constantProperty, deprecated,
+                                          e, checkTypes, checkVars, conformanceV
+                                          iolations, const, constantProperty,
+                                          deprecated, deprecatedAnnotations,
                                           duplicateMessage, es3, es5Strict,
                                           externsValidation, fileoverviewTags,
                                           globalThis, inferredConstCheck,
@@ -114,9 +127,10 @@
                                           , ambiguousFunctionDecl, checkEventful
                                           ObjectDisposal, checkRegExp, checkStru
                                           ctDictInheritance, checkTypes,
-                                          checkVars, const, constantProperty,
-                                          deprecated, duplicateMessage, es3,
-                                          es5Strict, externsValidation,
+                                          checkVars, conformanceViolations,
+                                          const, constantProperty, deprecated,
+                                          deprecatedAnnotations, duplicateMessag
+                                          e, es3, es5Strict, externsValidation,
                                           fileoverviewTags, globalThis,
                                           inferredConstCheck, internetExplorerCh
                                           ecks, invalidCasts, misplacedTypeAnnot
@@ -132,12 +146,14 @@
                                           sources conform. Options: ECMASCRIPT3
                                           (default), ECMASCRIPT5, ECMASCRIPT5_ST
                                           RICT, ECMASCRIPT6 (experimental),
-                                          ECMASCRIPT6_STRICT (experimental)
+                                          ECMASCRIPT6_STRICT (experimental),
+                                          ECMASCRIPT6_TYPED (experimental)
  --language_out VAL                     : Sets what language spec the output
                                           should conform to.  If omitted,
                                           defaults to the value of language_in.
                                           Options: ECMASCRIPT3, ECMASCRIPT5,
-                                          ECMASCRIPT5_STRICT
+                                          ECMASCRIPT5_STRICT, ECMASCRIPT6_TYPED
+                                          (experimental)
  --logging_level VAL                    : The logging level (standard java.util.
                                           logging.Level values) for Compiler
                                           progress. Does not control errors or
@@ -161,8 +177,11 @@
                                           listed in the corresponding order.
                                           Where --module flags occur in
                                           relation to --js flags is unimportant.
-                                          Provide the value 'auto' to trigger
-                                          module creation from CommonJSmodules.
+                                          <num-js-files> may be set to 'auto'
+                                          for the first module if it has no
+                                          dependencies. Provide the value
+                                          'auto' to trigger module creation
+                                          from CommonJSmodules.
  --module_output_path_prefix VAL        : Prefix for filenames of compiled JS
                                           modules. <module-name>.js will be
                                           appended to this prefix. Directories
@@ -205,6 +224,8 @@
                                           the file contents to the --output_wrap
                                           per flag, replacing the value if it
                                           exists.
+ --polymer_pass                         : Rewrite Polymer classes to be
+                                          compiler-friendly.
  --print_ast                            : Prints a dot file describing the
                                           internal abstract syntax tree and
                                           exits
@@ -214,7 +235,7 @@
  --process_closure_primitives           : Processes built-ins from the Closure
                                           library, such as goog.require(),
                                           goog.provide(), and goog.exportSymbol(
-                                          )
+                                          ). True by default.
  --process_common_js_modules            : Process CommonJS modules to a
                                           concatenable form.
  --process_jquery_primitives            : Processes built-ins from the Jquery
@@ -223,11 +244,15 @@
  --property_renaming_report VAL         : File where the serialized version of
                                           the property renaming map produced
                                           should be saved
- --rewrite_es6_modules                  : Rewrite ES6 modules to a concatenable
-                                          form.
+ --rename_prefix_namespace VAL          : Specifies the name of an object that
+                                          will be used to store all non-extern
+                                          globals
  --source_map_format [DEFAULT | V3]     : The source map format to produce.
                                           Options are V3 and DEFAULT, which are
                                           equivalent.
+ --source_map_input VAL                 : Source map locations for input files,
+                                          separated by a '|', (i.e. input-file-p
+                                          ath|input-source-map)
  --source_map_location_mapping VAL      : Source map location mapping separated
                                           by a '|' (i.e. filesystem-path|webserv
                                           er-path)
@@ -258,11 +283,10 @@
                                           skip other passes.
  --use_only_custom_externs              : Specifies whether the default externs
                                           should be excluded
- --use_types_for_optimization           : Experimental: perform additional
-                                          optimizations based on available
-                                          information.  Inaccurate type
-                                          annotations may result in incorrect
-                                          results.
+ --use_types_for_optimization           : Enable or disable the optimizations
+                                          based on available type information.
+                                          Inaccurate type annotations may
+                                          result in incorrect results.
  --variable_renaming_report VAL         : File where the serialized version of
                                           the variable renaming map produced
                                           should be saved
