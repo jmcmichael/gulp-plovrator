@@ -24,7 +24,7 @@ var closureCompiler = require('gulp-closure-compiler');
 gulp.task('default', function() {
   return gulp.src('src/*.js')
     .pipe(closureCompiler({
-      compilerPath: 'bower_components/closure-compiler/compiler.jar',
+      compilerPath: 'bower_components/closure-compiler/lib/vendor/compiler.jar',
       fileName: 'build.js'
     }))
     .pipe(gulp.dest('dist'));
@@ -42,7 +42,7 @@ var closureCompiler = require('gulp-closure-compiler');
 gulp.task('default', function() {
   return gulp.src('src/*.js')
     .pipe(closureCompiler({
-      compilerPath: 'bower_components/closure-compiler/compiler.jar',
+      compilerPath: 'bower_components/closure-compiler/lib/vendor/compiler.jar',
       fileName: 'build.js',
       compilerFlags: {
         closure_entry_point: 'app.main',
