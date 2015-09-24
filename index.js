@@ -10,7 +10,7 @@ var through = require('through');
 var tmpdir = require('os').tmpdir();
 var uuid = require('uuid');
 
-const PLUGIN_NAME = 'gulp-closure-library';
+const PLUGIN_NAME = 'gulp-closure-compiler';
 
 module.exports = function(opt, execFile_opt) {
   opt = opt || {};
