@@ -77,7 +77,7 @@ module.exports = function(opt, execFile_opt) {
       args = [
         '-jar',
         // For faster compilation. It's supported everywhere from Java 1.7+.
-        '-XX:+TieredCompilation',
+        opt.tieredCompilation ? '-XX:+TieredCompilation' : '-XX:-TieredCompilation',
         opt.compilerPath,
         // To prevent maximum length of command line string exceeded error.
         '--flagfile="' + getFlagFilePath(files) + '"'

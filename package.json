@@ -29,8 +29,8 @@
     "minify"
   ],
   "dependencies": {
-    "glob": "^4.3.2",
-    "graceful-fs": "^3.0.5",
+    "glob": "^5.0.14",
+    "graceful-fs": "^4.1.2",
     "gulp-util": "^3.0.0",
     "mkdirp": "^0.5.0",
     "temp-write": "^1.0.0",
@@ -41,6 +41,6 @@
     "event-stream": "^3.1.0",
     "gulp": "^3.5.6",
     "mocha": "*",
-    "vinyl": "^0.4.3"
+    "vinyl": "^0.5.3"
   }
 }

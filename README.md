@@ -115,6 +115,12 @@ Type: `Object`
 
 Closure compiler [flags](https://github.com/steida/gulp-closure-compiler/blob/master/flags.txt).
 
+##### tieredCompilation
+
+Type: `Boolean`  
+
+Tiered compilation enhances the speed of compilation. It's supported everywhere since Java 1.7+, but requires the installation of a JDK.
+
 ##### maxBuffer
 
 Type: `Number` 
