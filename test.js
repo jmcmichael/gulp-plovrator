@@ -10,7 +10,7 @@ it('should minify JS', function (done) {
 	var execFile = function(cmd, args, cb) {
     assert.equal(cmd, 'java');
     assert.equal(args[0], '-jar');
-    assert.equal(args[1], '-XX:+TieredCompilation');
+    assert.equal(args[1], '-XX:-TieredCompilation');
     assert.equal(args[2], 'compiler.jar');
     assert.ok(/^--flagfile=/.test(args[3]));
     assert.ok(/^--js_output_file=/.test(args[4]));
@@ -40,7 +40,7 @@ it('source maps are being generated', function (done) {
   var execFile = function(cmd, args, options, cb) {
     assert.equal(cmd, 'java');
     assert.equal(args[0], '-jar');
-    assert.equal(args[1], '-XX:+TieredCompilation');
+    assert.equal(args[1], '-XX:-TieredCompilation');
     assert.equal(args[2], 'compiler.jar');
     assert.ok(/^--flagfile=/.test(args[3]));
     assert.ok(/^--create_source_map=/.test(args[4]));
