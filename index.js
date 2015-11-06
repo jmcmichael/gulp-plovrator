@@ -133,7 +133,6 @@ module.exports = function(opt, execFile_opt) {
           cwd: tmpPath,
           path: path.join(tmpPath, opt.fileName)
         });
-        this.emit('data', compiledFile);
 
         // fetch and emit sourcemap, if requested
         if(opt.createSourceMap === true) {
@@ -149,8 +148,17 @@ module.exports = function(opt, execFile_opt) {
             cwd: tmpPath,
             path: path.join(tmpPath, sourcemapName)
           });
-          this.emit('data', sourcemapFile);
+          // append sourcemap comment to compiled file
+          var mapComment = new Buffer('//# sourceMappingURL=' + sourcemapName);
+          compiledFile = new gutil.File({
+            base: tmpPath,
+            contents: Buffer.concat([compiled, mapComment]),
+            cwd: tmpPath,
+            path: path.join(tmpPath, opt.fileName)
+          });
         }
+        this.emit('data', compiledFile);
+        if(opt.createSourceMap === true) { this.emit('data', sourcemapFile); }
         this.emit('end');
       }.bind(this));
     }.bind(this))
