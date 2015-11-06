@@ -97,6 +97,11 @@ module.exports = function(opt, execFile_opt) {
     // Force --js_output_file to prevent [Error: stdout maxBuffer exceeded.]
     args.push('--js_output_file="' + opt.fileName + '"');
 
+    if (opt.createSourceMap === true) {
+      var sourcemapName = opt.fileName + '.map';
+      args.push('--create_source_map="' + sourcemapName + '"');
+    }
+
     // Create directory for output file if it doesn't exist.
     if (opt.fileName && !fs.existsSync(path.dirname(opt.fileName))) {
       fs.mkdirSync(path.dirname(opt.fileName));
@@ -114,18 +119,36 @@ module.exports = function(opt, execFile_opt) {
         gutil.log(stderr);
       }
 
+      // fetch and emit compiled file
       try {
         var compiled = fs.readFileSync(opt.fileName);
       } catch (err) {
         this.emit('error', new gutil.PluginError(PLUGIN_NAME, err));
       }
-      var outputFile = new gutil.File({
+      var compiledFile = new gutil.File({
         base: appFile.base,
         contents: compiled,
         cwd: appFile.cwd,
         path: path.join(appFile.base, opt.fileName)
       });
-      this.emit('data', outputFile);
+      this.emit('data', compiledFile);
+
+      // fetch and emit sourcemap, if requested
+      if(opt.createSourceMap === true) {
+        try {
+          var sourcemap = fs.readFileSync(sourcemapName);
+        } catch (err) {
+          this.emit('error', new gutil.PluginError(PLUGIN_NAME, err));
+        }
+
+        var sourcemapFile = new gutil.File({
+          base: appFile.base,
+          contents: sourcemap,
+          cwd: appFile.cwd,
+          path: path.join(appFile.base, sourcemapName)
+        });
+        this.emit('data', sourcemapFile);
+      }
       this.emit('end');
     }.bind(this));
   }
