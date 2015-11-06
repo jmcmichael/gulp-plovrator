@@ -70,7 +70,8 @@ module.exports = function(opt, execFile_opt) {
 
   function endStream() {
     if (!files.length) return this.emit('end');
-    var firstFile = files[0];
+    var firstFile = files[0],
+      appFile = files[2]; // this is REALLY ugly - we really have no idea which file is the app file
     var outputFilePath = tempWrite.sync('');
     var args;
     if (opt.compilerPath) {
@@ -113,26 +114,19 @@ module.exports = function(opt, execFile_opt) {
         gutil.log(stderr);
       }
 
-      var outputFileSrc = fs.readFile(opt.fileName, function(err, data) {
-        if (err) {
-          this.emit('error', new gutil.PluginError(PLUGIN_NAME, err));
-          return;
-        }
-
-        if(opt.fileName){
-          var outputFile = new gutil.File({
-            base: firstFile.base,
-            contents: new Buffer(data),
-            cwd: firstFile.cwd,
-            path: path.join(firstFile.base, opt.fileName)
-          });
-
-         this.emit('data', outputFile);
-         fs.unlinkSync(opt.fileName);
-        }
-        this.emit('end');
-      }.bind(this));
-
+      try {
+        var compiled = fs.readFileSync(opt.fileName);
+      } catch (err) {
+        this.emit('error', new gutil.PluginError(PLUGIN_NAME, err));
+      }
+      var outputFile = new gutil.File({
+        base: appFile.base,
+        contents: compiled,
+        cwd: appFile.cwd,
+        path: path.join(appFile.base, opt.fileName)
+      });
+      this.emit('data', outputFile);
+      this.emit('end');
     }.bind(this));
   }
 
