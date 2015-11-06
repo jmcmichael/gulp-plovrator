@@ -109,12 +109,6 @@ module.exports = function(opt, execFile_opt) {
         args.push('--create_source_map="' + sourcemapFilePath + '"');
       }
 
-
-      // Create directory for output file if it doesn't exist.
-      //if (opt.fileName && !fs.existsSync(path.dirname(opt.fileName))) {
-      //  fs.mkdirSync(path.dirname(opt.fileName));
-      //}
-
       // Enable custom max buffer to fix "stderr maxBuffer exceeded" error. Default is 1000*1024.
       var executable = opt.compilerPath ? 'java' : 'closure-compiler';
       var jar = execFile(executable, args, { maxBuffer: opt.maxBuffer*1024 }, function(error, stdout, stderr) {
@@ -134,10 +128,10 @@ module.exports = function(opt, execFile_opt) {
           this.emit('error', new gutil.PluginError(PLUGIN_NAME, err));
         }
         var compiledFile = new gutil.File({
-          base: appFile.base,
+          base: tmpPath,
           contents: compiled,
-          cwd: appFile.cwd,
-          path: path.join(appFile.base, opt.fileName)
+          cwd: tmpPath,
+          path: path.join(tmpPath, opt.fileName)
         });
         this.emit('data', compiledFile);
 
@@ -150,10 +144,10 @@ module.exports = function(opt, execFile_opt) {
           }
 
           var sourcemapFile = new gutil.File({
-            base: appFile.base,
+            base: tmpPath,
             contents: sourcemap,
-            cwd: appFile.cwd,
-            path: path.join(appFile.base, sourcemapName)
+            cwd: tmpPath,
+            path: path.join(tmpPath, sourcemapName)
           });
           this.emit('data', sourcemapFile);
         }
