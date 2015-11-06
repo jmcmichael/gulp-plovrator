@@ -6,6 +6,7 @@ var gutil = require('gulp-util');
 var mkdirp = require('mkdirp');
 var path = require('path');
 var tempWrite = require('temp-write');
+var temp = require('temp').track();
 var through = require('through');
 var tmpdir = require('os').tmpdir();
 var uuid = require('uuid');
@@ -21,14 +22,6 @@ module.exports = function(opt, execFile_opt) {
 
   if (!opt.fileName && !hasModules())
     throw new gutil.PluginError(PLUGIN_NAME, 'Missing fileName option.');
-
-  var getFlagFilePath = function(files) {
-    var src = files.map(function(file) {
-      var relativePath = path.relative(file.cwd, file.path);
-      return '--js="' + relativePath + '"';
-    }).join('\n');
-    return tempWrite.sync(src);
-  };
 
   // Can't use sindresorhus/dargs, compiler requires own syntax.
   var flagsToArgs = function(flags) {
@@ -69,88 +62,104 @@ module.exports = function(opt, execFile_opt) {
 
 
   function endStream() {
-    if (!files.length) return this.emit('end');
-    var firstFile = files[0],
-      appFile = files[2]; // this is REALLY ugly - we really have no idea which file is the app file
-    var outputFilePath = tempWrite.sync('');
-    var args;
-    if (opt.compilerPath) {
-      args = [
-        '-jar',
-        // For faster compilation. It's supported everywhere from Java 1.7+.
-        opt.tieredCompilation ? '-XX:+TieredCompilation' : '-XX:-TieredCompilation',
-        opt.compilerPath,
-        // To prevent maximum length of command line string exceeded error.
-        '--flagfile="' + getFlagFilePath(files) + '"'
-      ];
-    } else {
-      args = [
-        // To prevent maximum length of command line string exceeded error.
-        '--flagfile="' + getFlagFilePath(files) + '"'
-      ];
-    }
-    args = args.concat(flagsToArgs(opt.compilerFlags));
+    temp.mkdir('closure-compiler-temp', function(err, tmpPath){
+      if (!files.length) return this.emit('end');
 
-    var javaFlags = opt.javaFlags || [];
-    args = javaFlags.concat(args);
+      var firstFile = files[0],
+        appFile = files[2]; // ugly - figure out a better way to identify the app file
 
-    // Force --js_output_file to prevent [Error: stdout maxBuffer exceeded.]
-    args.push('--js_output_file="' + opt.fileName + '"');
+      // create flag file
+      var flagFileTxt = files.map(function(file) {
+        var relativePath = path.relative(file.cwd, file.path);
+        return '--js="' + relativePath + '"';
+      }).join('\n');
+      var flagFilePath = tmpPath + '/flagFile.txt';
+      fs.writeFileSync(flagFilePath, flagFileTxt);
 
-    if (opt.createSourceMap === true) {
-      var sourcemapName = opt.fileName + '.map';
-      args.push('--create_source_map="' + sourcemapName + '"');
-    }
+      // create args
+      var args;
+      if (opt.compilerPath) {
+        args = [
+          '-jar',
+          // For faster compilation. It's supported everywhere from Java 1.7+.
+          opt.tieredCompilation ? '-XX:+TieredCompilation' : '-XX:-TieredCompilation',
+          opt.compilerPath,
+          // To prevent maximum length of command line string exceeded error.
+          '--flagfile="' + flagFilePath + '"'
+        ];
+      } else {
+        args = [
+          // To prevent maximum length of command line string exceeded error.
+          '--flagfile="' + flagFilePath + '"'
+        ];
+      }
+      args = args.concat(flagsToArgs(opt.compilerFlags));
 
-    // Create directory for output file if it doesn't exist.
-    if (opt.fileName && !fs.existsSync(path.dirname(opt.fileName))) {
-      fs.mkdirSync(path.dirname(opt.fileName));
-    }
+      var javaFlags = opt.javaFlags || [];
+      args = javaFlags.concat(args);
 
-    // Enable custom max buffer to fix "stderr maxBuffer exceeded" error. Default is 1000*1024.
-    var executable = opt.compilerPath ? 'java' : 'closure-compiler';
-    var jar = execFile(executable, args, { maxBuffer: opt.maxBuffer*1024 }, function(error, stdout, stderr) {
-      if (error || (stderr && !opt.continueWithWarnings)) {
-        this.emit('error', new gutil.PluginError(PLUGIN_NAME, error || stderr));
-        return;
+      var outputFilePath = tmpPath + '/' + opt.fileName;
+      // Force --js_output_file to prevent [Error: stdout maxBuffer exceeded.]
+      args.push('--js_output_file="' + outputFilePath + '"');
+
+
+      if (opt.createSourceMap === true) {
+        var sourcemapName = opt.fileName + '.map';
+        var sourcemapFilePath = tmpPath + '/' + sourcemapName;
+        args.push('--create_source_map="' + sourcemapFilePath + '"');
       }
 
-      if (stderr) {
-        gutil.log(stderr);
-      }
 
-      // fetch and emit compiled file
-      try {
-        var compiled = fs.readFileSync(opt.fileName);
-      } catch (err) {
-        this.emit('error', new gutil.PluginError(PLUGIN_NAME, err));
-      }
-      var compiledFile = new gutil.File({
-        base: appFile.base,
-        contents: compiled,
-        cwd: appFile.cwd,
-        path: path.join(appFile.base, opt.fileName)
-      });
-      this.emit('data', compiledFile);
+      // Create directory for output file if it doesn't exist.
+      //if (opt.fileName && !fs.existsSync(path.dirname(opt.fileName))) {
+      //  fs.mkdirSync(path.dirname(opt.fileName));
+      //}
 
-      // fetch and emit sourcemap, if requested
-      if(opt.createSourceMap === true) {
+      // Enable custom max buffer to fix "stderr maxBuffer exceeded" error. Default is 1000*1024.
+      var executable = opt.compilerPath ? 'java' : 'closure-compiler';
+      var jar = execFile(executable, args, { maxBuffer: opt.maxBuffer*1024 }, function(error, stdout, stderr) {
+        if (error || (stderr && !opt.continueWithWarnings)) {
+          this.emit('error', new gutil.PluginError(PLUGIN_NAME, error || stderr));
+          return;
+        }
+
+        if (stderr) {
+          gutil.log(stderr);
+        }
+
+        // fetch and emit compiled file
         try {
-          var sourcemap = fs.readFileSync(sourcemapName);
+          var compiled = fs.readFileSync(outputFilePath);
         } catch (err) {
           this.emit('error', new gutil.PluginError(PLUGIN_NAME, err));
         }
-
-        var sourcemapFile = new gutil.File({
+        var compiledFile = new gutil.File({
           base: appFile.base,
-          contents: sourcemap,
+          contents: compiled,
           cwd: appFile.cwd,
-          path: path.join(appFile.base, sourcemapName)
+          path: path.join(appFile.base, opt.fileName)
         });
-        this.emit('data', sourcemapFile);
-      }
-      this.emit('end');
-    }.bind(this));
+        this.emit('data', compiledFile);
+
+        // fetch and emit sourcemap, if requested
+        if(opt.createSourceMap === true) {
+          try {
+            var sourcemap = fs.readFileSync(sourcemapFilePath);
+          } catch (err) {
+            this.emit('error', new gutil.PluginError(PLUGIN_NAME, err));
+          }
+
+          var sourcemapFile = new gutil.File({
+            base: appFile.base,
+            contents: sourcemap,
+            cwd: appFile.cwd,
+            path: path.join(appFile.base, sourcemapName)
+          });
+          this.emit('data', sourcemapFile);
+        }
+        this.emit('end');
+      }.bind(this));
+    }.bind(this))
   }
 
   return through(bufferContents, endStream);
