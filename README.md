@@ -1,6 +1,6 @@
 # [gulp](http://gulpjs.com)-ploverator
-> Gulp plugin that (will eventually) emulate the [https://github.com/bolinfest/plovr](Plovr build tool) for the Closure compiler
-(a fork of [https://github.com/steida/gulp-closure-compiler](gulp-closure-compiler))
+> Gulp plugin that (will eventually) emulate the [Plovr build tool](https://github.com/bolinfest/plovr) for the Closure compiler
+(a fork of [gulp-closure-compiler](https://github.com/steida/gulp-closure-compiler))
 
 *Issues with the output or Java should be reported on the Closure Compiler [issue tracker](https://github.com/google/closure-compiler/issues).*
 
@@ -18,7 +18,7 @@ Simple optimizations for classic minifying.
 
 ```js
 var gulp = require('gulp');
-var closureCompiler = require('gulp-closure-compiler');
+var closureCompiler = require('gulp-ploverator');
 
 gulp.task('default', function() {
   return gulp.src('src/*.js')
@@ -36,7 +36,7 @@ Advanced optimizations is much more aggressive. It's aimed for libraries like [C
 
 ```js
 var gulp = require('gulp');
-var closureCompiler = require('gulp-closure-compiler');
+var closureCompiler = require('gulp-ploverator');
 
 gulp.task('default', function() {
   return gulp.src('src/*.js')
@@ -69,7 +69,7 @@ The current version of the compiler doesn't need a deps file as it used to. Now 
 
 ```js
 var gulp = require('gulp');
-var closureCompiler = require('gulp-closure-compiler');
+var closureCompiler = require('gulp-ploverator');
 
 gulp.task('default', function() {
   return gulp.src(['main.js', 'src/**/*.js', 'bower_components/closure-library/closure/goog/**/*.js'])
