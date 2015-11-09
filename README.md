@@ -1,14 +1,13 @@
-# [gulp](http://gulpjs.com)-closure-compiler
-[![Build Status](https://secure.travis-ci.org/steida/gulp-closure-compiler.png?branch=master)](http://travis-ci.org/steida/gulp-closure-compiler) [![Dependency Status](https://david-dm.org/steida/gulp-closure-compiler.png)](https://david-dm.org/steida/gulp-closure-compiler) [![devDependency Status](https://david-dm.org/steida/gulp-closure-compiler/dev-status.png)](https://david-dm.org/steida/gulp-closure-compiler#info=devDependencies)
-
-> Gulp plugin for Google Closure Compiler
+# [gulp](http://gulpjs.com)-ploverator
+> Gulp plugin that (will eventually) emulate the [https://github.com/bolinfest/plovr](Plovr build tool) for the Closure compiler
+(a fork of [https://github.com/steida/gulp-closure-compiler](gulp-closure-compiler))
 
 *Issues with the output or Java should be reported on the Closure Compiler [issue tracker](https://github.com/google/closure-compiler/issues).*
 
 ## Install
 
 ```
-npm install --save-dev gulp-closure-compiler
+npm install --save-dev gulp-plovrator
 ```
 
 ## Example
@@ -113,7 +112,7 @@ Path to compiler.jar
 
 Type: `Object`  
 
-Closure compiler [flags](https://github.com/steida/gulp-closure-compiler/blob/master/flags.txt).
+Closure compiler [flags](https://github.com/jmcmichael/gulp-plovrator/blob/master/flags.txt).
 
 ##### tieredCompilation
 
@@ -133,20 +132,6 @@ Type: `boolean`
 
 Ignore the warnings and continue with the compiler.  This adds flexiblity to some projects that can't work around certain warnings.  Default value is false.
 
-## How to download [Closure Compiler](https://developers.google.com/closure/compiler/)
-
-Use [Bower](http://bower.io/).
-
-```js
-{
-  "name": "foo",
-  "version": "0.0.0",
-  "dependencies": {
-    "closure-compiler": "http://dl.google.com/closure-compiler/compiler-latest.zip"
-  }
-}
-```
-
 ## Implementation notes
 
 - Closure compiler supports pipes, but not correctly [(issue)](https://code.google.com/p/closure-compiler/issues/detail?id=1292).
@@ -155,4 +140,6 @@ Use [Bower](http://bower.io/).
 
 ## License
 
-MIT © [Daniel Steigerwald](https://github.com/steida)
+MIT © [Daniel Steigerwald](https://github.com/steida),
+
+MIT © [Joshua McMichael](https://github.com/jmcmichael)
