@@ -1,8 +1,9 @@
 {
-  "name": "gulp-ploverator",
+  "name": "gulp-plovrator",
   "version": "0.0.1",
   "description": "Gulp plugin to emulate many features of the Plovr build tool",
   "license": "MIT",
+  "private": "true",
   "repository": {
     "type": "git",
     "url": "https://github.com/jmcmichael/gulp-ploverator.git"
@@ -34,6 +35,8 @@
     "graceful-fs": "^4.1.2",
     "gulp-util": "^3.0.0",
     "mkdirp": "^0.5.0",
+    "rev-hash": "^1.0.0",
+    "rev-path": "^1.0.0",
     "temp-write": "^1.0.0",
     "through": "^2.3.4",
     "uuid": "^2.0.1"

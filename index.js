@@ -10,6 +10,8 @@ var temp = require('temp').track();
 var through = require('through');
 var tmpdir = require('os').tmpdir();
 var uuid = require('uuid');
+var revHash = require('rev-hash');
+var revPath = require('rev-path');
 
 const PLUGIN_NAME = 'gulp-closure-compiler';
 
@@ -127,11 +129,20 @@ module.exports = function(opt, execFile_opt) {
         } catch (err) {
           this.emit('error', new gutil.PluginError(PLUGIN_NAME, err));
         }
+
+        if(opt.fingerprint) {
+          var revHash = revHash(compiled);
+          var cPath = revPath(path.join(tmpPath, opt.fileName), revHash(compiled))
+        } else {
+          var cPath = path.join(tmpPath, opt.fileName);
+        }
+
+
         var compiledFile = new gutil.File({
           base: tmpPath,
           contents: compiled,
           cwd: tmpPath,
-          path: path.join(tmpPath, opt.fileName)
+          path: cPath
         });
 
         // fetch and emit sourcemap, if requested
