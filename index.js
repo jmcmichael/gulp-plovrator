@@ -13,7 +13,7 @@ var uuid = require('uuid');
 var revHash = require('rev-hash');
 var revPath = require('rev-path');
 
-const PLUGIN_NAME = 'gulp-closure-compiler';
+const PLUGIN_NAME = 'gulp-plovrator';
 
 module.exports = function(opt, execFile_opt) {
   opt = opt || {};
@@ -129,6 +129,8 @@ module.exports = function(opt, execFile_opt) {
         } catch (err) {
           this.emit('error', new gutil.PluginError(PLUGIN_NAME, err));
         }
+
+        debugger;
 
         if(opt.fingerprint) {
           var revHash = revHash(compiled);
