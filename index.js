@@ -130,11 +130,9 @@ module.exports = function(opt, execFile_opt) {
           this.emit('error', new gutil.PluginError(PLUGIN_NAME, err));
         }
 
-        debugger;
-
         if(opt.fingerprint) {
-          var revHash = revHash(compiled);
-          var cPath = revPath(path.join(tmpPath, opt.fileName), revHash(compiled))
+          var cHash = revHash(compiled);
+          var cPath = revPath(path.join(tmpPath, opt.fileName), cHash)
         } else {
           var cPath = path.join(tmpPath, opt.fileName);
         }
@@ -155,19 +153,27 @@ module.exports = function(opt, execFile_opt) {
             this.emit('error', new gutil.PluginError(PLUGIN_NAME, err));
           }
 
+          if(opt.fingerprint) {
+            var sHash = revHash(sourcemap);
+            var sPath = revPath(path.join(tmpPath, sourcemapName), sHash)
+          } else {
+            var sPath = path.join(tmpPath, sourcemapName);
+          }
+
           var sourcemapFile = new gutil.File({
             base: tmpPath,
             contents: sourcemap,
             cwd: tmpPath,
-            path: path.join(tmpPath, sourcemapName)
+            path: sPath
           });
+
           // append sourcemap comment to compiled file
-          var mapComment = new Buffer('//# sourceMappingURL=' + sourcemapName);
+          var mapComment = new Buffer('//# sourceMappingURL=' + path.basename(sPath));
           compiledFile = new gutil.File({
             base: tmpPath,
             contents: Buffer.concat([compiled, mapComment]),
             cwd: tmpPath,
-            path: path.join(tmpPath, opt.fileName)
+            path: cPath
           });
         }
         this.emit('data', compiledFile);
