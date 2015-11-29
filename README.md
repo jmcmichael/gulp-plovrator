@@ -1,4 +1,4 @@
-# [gulp](http://gulpjs.com)-ploverator
+# [gulp](http://gulpjs.com)-plovrator
 > Gulp plugin that (will eventually) emulate the [Plovr build tool](https://github.com/bolinfest/plovr) for the Closure compiler
 (a fork of [gulp-closure-compiler](https://github.com/steida/gulp-closure-compiler))
 
@@ -18,7 +18,7 @@ Simple optimizations for classic minifying.
 
 ```js
 var gulp = require('gulp');
-var closureCompiler = require('gulp-ploverator');
+var closureCompiler = require('gulp-plovrator');
 
 gulp.task('default', function() {
   return gulp.src('src/*.js')
