@@ -6,7 +6,7 @@
   "private": "true",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jmcmichael/gulp-ploverator.git"
+    "url": "https://github.com/jmcmichael/gulp-plovrator.git"
   },
   "author": {
     "name": "Joshua McMichael",
@@ -24,6 +24,7 @@
   "keywords": [
     "closure",
     "plovr",
+    "plovrator",
     "compiler",
     "compress",
     "google",

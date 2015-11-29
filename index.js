@@ -5,10 +5,8 @@ var glob = require('glob');
 var gutil = require('gulp-util');
 var mkdirp = require('mkdirp');
 var path = require('path');
-var tempWrite = require('temp-write');
 var temp = require('temp').track();
 var through = require('through');
-var tmpdir = require('os').tmpdir();
 var uuid = require('uuid');
 var revHash = require('rev-hash');
 var revPath = require('rev-path');
@@ -154,8 +152,7 @@ module.exports = function(opt, execFile_opt) {
           }
 
           if(opt.fingerprint) {
-            var sHash = revHash(sourcemap);
-            var sPath = revPath(path.join(tmpPath, sourcemapName), sHash)
+            var sPath = revPath(path.join(tmpPath, sourcemapName), cHash)
           } else {
             var sPath = path.join(tmpPath, sourcemapName);
           }
